@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import org.bson.Document;
 
-
+/**
+ * Simple POJO "model" class representing a note.
+ */
 public class Note implements Serializable {
 
     private static final long serialVersionUID = -1;

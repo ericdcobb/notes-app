@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * Override default Spring error handling by implementing ErrorController.
+ */
 @RestController
 public class NoteErrorController implements ErrorController {
 
@@ -33,6 +36,13 @@ public class NoteErrorController implements ErrorController {
         return PATH;
     }
 
+    /**
+     * Extract error attributes from the request.
+     * 
+     * @param request
+     * @param includeStackTrace
+     * @return Map to be passed into JsonError
+     */
     private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
         RequestAttributes requestAttributes = new ServletRequestAttributes(request);
         Throwable exception = errorAttributes.getError(requestAttributes);

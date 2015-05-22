@@ -11,6 +11,9 @@ import org.junit.Test;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+/**
+ * Test mongoDB connectivity
+ */
 public class MongoTest {
 
     private static final String DB_NAME = "heroku_app21961127";
@@ -19,12 +22,18 @@ public class MongoTest {
 
 	private MongoConnection connection;
 
+    /**
+     * Initialize a mongoDB connection
+     */
     @Before
     public void setUp() {
     	final String mongoUri = String.format(TEST_URI, DB_NAME, DB_NAME);
         connection = new MongoConnection(mongoUri);
     }
 
+    /**
+     * Test that the mongoDB connection is valid
+     */
     @Test
     public void testMongoConnected() {
     	assertNotNull(connection);
@@ -33,6 +42,9 @@ public class MongoTest {
     	assertEquals(DB_NAME, db.getName());
     }
 
+    /**
+     * Test that the 'notes' collection exists
+     */
     @Test
     public void testCollectionExists() {
     	final MongoDatabase db = connection.getDatabase();
@@ -42,6 +54,10 @@ public class MongoTest {
     	assertEquals(expectedNamespace, collection.getNamespace().toString());
     }
 
+	/**
+	 * Close the mongoDB connection.
+	 * @throws Exception
+	 */
 	@After
 	public void tearDown() throws Exception {
 		connection.close();

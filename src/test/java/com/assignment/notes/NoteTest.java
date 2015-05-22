@@ -7,6 +7,9 @@ import static org.junit.Assert.assertNull;
 import org.bson.Document;
 import org.junit.Test;
 
+/**
+ * Test Note POJO class
+ */
 public class NoteTest {
 
 	@Test
@@ -17,6 +20,9 @@ public class NoteTest {
 		assertNull(note.getBody());
 	}
 
+	/**
+	 * Test simple bean accessors
+	 */
 	@Test
 	public void testNoteBean() {
 		final Note note = new Note(134L, "hello");
@@ -25,6 +31,9 @@ public class NoteTest {
 		assertEquals(note.getBody(), "hello");
 	}
 	
+	/**
+	 * Test conversion from note to Document
+	 */
 	@Test
 	public void testNoteToDocumentConversion() {
 		final Long noteId = 123L;
@@ -40,6 +49,9 @@ public class NoteTest {
 		assertEquals(docId, noteId);
 	}
 	
+	/**
+	 * Test conversion from Document to Note
+	 */
 	@Test
 	public void testDocumentToNoteConversion() {
 		final Long docId = 345L;

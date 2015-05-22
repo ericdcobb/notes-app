@@ -25,6 +25,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 
+/**
+ * Spring Controller class.  This class handles the REST requests for the "/api/notes" resource.
+ */
 @RestController
 @RequestMapping("/api/notes")
 public class NoteController {
@@ -38,16 +41,31 @@ public class NoteController {
     private MongoConnection connection;
 
 
+	/**
+	 * Initialize a mongoDB connection. Using PostConstruct to make sure we can
+	 * grab the property from application.properties.
+	 */
     @PostConstruct
     public void initialize() {
         connection = new MongoConnection(mongoUri);
-        updateCounter();
+        updateCounter();	// find the max note id in the database and update the counter with it 
     }
 
+    /* 
+     * Clean up the mongoDB connection.
+     * 
+     * @see java.lang.Object#finalize()
+     */
     protected void finalize() {
         connection.close();
     }
     
+    /**
+     * Handle GET requests that can return multiple notes (i.e. /api/notes and /api/notes?query=)
+     * 
+     * @param filter the query filter provided, if any.
+     * @return list of notes
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<Note> findAll(@RequestParam(value="query", required=false) String filter) {
         MongoDatabase db = connection.getDatabase();
@@ -59,12 +77,14 @@ public class NoteController {
         }
         else {
             Document regexQuery = new Document();
-            regexQuery.put("body", new Document("$regex", filter).append("$options", "i")); // case insensitive
+            // compose a regex case-insensitive expression
+            regexQuery.put("body", new Document("$regex", filter).append("$options", "i"));
             docs = notes.find(regexQuery);
         }
 
         ArrayList<Note> list = new ArrayList<Note>();
         MongoCursor<Document> cursor = docs.iterator();
+        // convert Document to Note for all results
         while (cursor.hasNext()) {
             final Note note = Note.fromDocument(cursor.next());
             list.add(note);
@@ -78,6 +98,12 @@ public class NoteController {
         return list;
     }
 
+    /**
+     * Handle GET requests for individual notes (i.e.. /api/notes/{id})
+     * 
+     * @param id the note id to retrieve
+     * @return retrieved note
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public Note findOne(@PathVariable("id") Long id) {
         MongoDatabase db = connection.getDatabase();
@@ -100,6 +126,12 @@ public class NoteController {
         return note;
     }
 
+    /**
+     * Handle POST requests for creating new notes.  Request Body must include at least "body" attribute.
+     * 
+     * @param note the note supplied in the request body
+     * @return the created note
+     */
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Note create(@RequestBody Note note) {
